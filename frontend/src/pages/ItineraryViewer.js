@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   Utensils, 
@@ -12,18 +12,23 @@ import LeafletMap from '../components/LeafletMap';
 
 const ItineraryViewer = () => {
   const { id } = useParams();
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const cityParam = params.get('city');
+
   const [itinerary, setItinerary] = useState(null);
   const [loading, setLoading] = useState(true);
 
   // Mock itinerary data for demo
   useEffect(() => {
+    const city = cityParam && cityParam.trim() ? cityParam : 'Mumbai';
     const mockItinerary = {
       id: id,
-      city: 'Mumbai',
+      city,
       totalBudget: 150000,
       days: 5,
       generatedAt: new Date().toISOString(),
-      summary: 'A perfect 5-day Mumbai adventure combining culture, cuisine, and iconic landmarks.',
+      summary: `A perfect 5-day ${city} adventure combining culture, cuisine, and iconic landmarks.`,
       totalCost: 142000,
       savings: 8000,
       recommendations: [
@@ -110,7 +115,7 @@ const ItineraryViewer = () => {
       setItinerary(mockItinerary);
       setLoading(false);
     }, 800);
-  }, [id]);
+  }, [id, cityParam]);
 
   if (loading) {
     return (

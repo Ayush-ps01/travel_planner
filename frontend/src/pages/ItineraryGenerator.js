@@ -106,7 +106,8 @@ const ItineraryGenerator = () => {
       const itineraryId = `itinerary_${Date.now()}`;
       
       toast.success('Itinerary generated successfully!');
-      navigate(`/itinerary/${itineraryId}`);
+      // Pass city to the viewer so map centers correctly
+      navigate(`/itinerary/${itineraryId}?city=${encodeURIComponent(formData.city)}`);
       
     } catch (error) {
       toast.error('Failed to generate itinerary. Please try again.');
