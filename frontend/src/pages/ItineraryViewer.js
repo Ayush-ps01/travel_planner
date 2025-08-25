@@ -144,6 +144,20 @@ function generateMockItinerary(city) {
   };
 }
 
+function calculateBudget(itinerary, providedBudget, providedDays) {
+  const daysCount = providedDays ? Number(providedDays) : itinerary.itinerary?.length || 0;
+  const activityTotal = (itinerary.itinerary || []).reduce((sum, d) => sum + (d.activities || []).reduce((s, a) => s + (Number(a.cost) || 0), 0), 0);
+  const diningTotal = (itinerary.itinerary || []).reduce((sum, d) => sum + (d.dining || []).reduce((s, r) => s + (Number(r.price_per_person) || 0), 0), 0);
+  const computedTotal = activityTotal + diningTotal;
+
+  const totalBudget = providedBudget ? Number(providedBudget) : Math.max(computedTotal * 1.2, 5000);
+  const totalCost = computedTotal;
+  const savings = Math.max(totalBudget - totalCost, 0);
+  const perDay = daysCount > 0 ? Math.round(totalCost / daysCount) : totalCost;
+
+  return { totalBudget, totalCost, savings, perDay };
+}
+
 const ItineraryViewer = () => {
   const { id } = useParams();
   const loc = useLocation();
@@ -154,15 +168,19 @@ const ItineraryViewer = () => {
 
   useEffect(() => {
     let city = params.get('city');
-    if (!city) {
-      try { city = sessionStorage.getItem('selectedCity') || ''; } catch {}
-    }
+    let budget = params.get('budget');
+    let days = params.get('days');
+    if (!city) { try { city = sessionStorage.getItem('selectedCity') || ''; } catch {} }
+    if (!budget) { try { budget = sessionStorage.getItem('selectedBudget') || ''; } catch {} }
+    if (!days) { try { days = sessionStorage.getItem('selectedDays') || ''; } catch {} }
+
     city = norm(city) || 'Mumbai';
 
     const mock = generateMockItinerary(city);
     const mockItinerary = { id, city, ...mock };
+    const budgetView = calculateBudget(mockItinerary, budget, days);
 
-    setItinerary(mockItinerary);
+    setItinerary({ ...mockItinerary, _budgetView: budgetView });
     setLoading(false);
   }, [id, loc.search]);
 
@@ -219,19 +237,19 @@ const ItineraryViewer = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center">
               <div className="text-3xl font-cyber font-bold text-neon-teal mb-1">
-                ₹{itinerary.totalCost.toLocaleString()}
+                ₹{itinerary._budgetView.totalCost.toLocaleString()}
               </div>
               <div className="text-dark-400">Total Cost</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-cyber font-bold text-green-400 mb-1">
-                ₹{itinerary.savings.toLocaleString()}
+                ₹{itinerary._budgetView.savings.toLocaleString()}
               </div>
               <div className="text-dark-400">Savings</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-cyber font-bold text-neon-purple mb-1">
-                ₹{Math.round(itinerary.totalCost / itinerary.days).toLocaleString()}
+                ₹{itinerary._budgetView.perDay.toLocaleString()}
               </div>
               <div className="text-dark-400">Per Day</div>
             </div>

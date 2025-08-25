@@ -100,19 +100,26 @@ const ItineraryGenerator = () => {
     
     try {
       // Simulate API call for demo
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      await new Promise(resolve => setTimeout(resolve, 800));
       
       // Generate a mock itinerary ID
       const itineraryId = `itinerary_${Date.now()}`;
       
-      // Persist selected city for the viewer fallback
+      // Persist selected inputs for viewer fallback
       try {
         sessionStorage.setItem('selectedCity', formData.city);
+        sessionStorage.setItem('selectedBudget', String(formData.budget));
+        sessionStorage.setItem('selectedDays', String(formData.days));
       } catch {}
 
       toast.success('Itinerary generated successfully!');
       // Pass city to the viewer so map centers correctly
-      navigate(`/itinerary/${itineraryId}?city=${encodeURIComponent(formData.city)}`);
+      const qs = new URLSearchParams({
+        city: formData.city,
+        budget: String(formData.budget),
+        days: String(formData.days)
+      }).toString();
+      navigate(`/itinerary/${itineraryId}?${qs}`);
       
     } catch (error) {
       toast.error('Failed to generate itinerary. Please try again.');
