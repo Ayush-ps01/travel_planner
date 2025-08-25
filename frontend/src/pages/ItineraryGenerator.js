@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { 
   MapPin, 
-  DollarSign, 
   Calendar, 
   Users, 
   Brain, 

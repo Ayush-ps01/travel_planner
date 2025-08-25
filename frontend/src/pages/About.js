@@ -5,7 +5,6 @@ import {
   Globe, 
   Zap, 
   Shield, 
-  Users, 
   Heart,
   Code,
   Rocket

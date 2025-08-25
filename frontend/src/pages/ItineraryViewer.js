@@ -2,20 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
-  Calendar, 
-  MapPin, 
-  Clock, 
   Utensils, 
   Camera,
   Download,
   Share2,
-  Heart,
-  Star,
-  Navigation,
-  Phone,
-  IndianRupee
+  Star
 } from 'lucide-react';
-import MapViewer from '../components/MapViewer';
+import LeafletMap from '../components/LeafletMap';
 
 const ItineraryViewer = () => {
   const { id } = useParams();
@@ -98,21 +91,13 @@ const ItineraryViewer = () => {
               cost: 0,
               duration_minutes: 60,
               category: 'attraction'
-            },
-            {
-              time: 'evening',
-              place: 'Worli Sea Face',
-              description: 'Evening walk along the scenic promenade with city views',
-              cost: 0,
-              duration_minutes: 75,
-              category: 'attraction'
             }
           ],
           dining: [
             {
               name: 'Bademiya',
               cuisine: 'Indian',
-              description: 'Famous street food joint known for kebabs and rolls',
+              description: 'Famous kebab and North Indian eatery',
               price_per_person: 800,
               price_range: '₹₹'
             }
@@ -124,36 +109,24 @@ const ItineraryViewer = () => {
     setTimeout(() => {
       setItinerary(mockItinerary);
       setLoading(false);
-    }, 1000);
+    }, 800);
   }, [id]);
 
   if (loading) {
     return (
-      <div className="min-h-screen pt-32 pb-20 flex items-center justify-center">
-        <div className="text-center">
-          <div className="spinner-cyber mx-auto mb-4"></div>
-          <p className="text-dark-300">Loading your itinerary...</p>
+      <div className="min-h-screen bg-gradient-to-br from-dark-900 via-dark-800 to-dark-900 text-white">
+        <div className="container mx-auto px-4 py-12">
+          <div className="text-center text-dark-300">Loading itinerary...</div>
         </div>
       </div>
     );
   }
 
-  if (!itinerary) {
-    return (
-      <div className="min-h-screen pt-32 pb-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-3xl font-cyber font-bold mb-4 text-red-500">
-            Itinerary Not Found
-          </h1>
-          <p className="text-dark-300">The requested itinerary could not be found.</p>
-        </div>
-      </div>
-    );
-  }
+  if (!itinerary) return null;
 
   return (
-    <div className="min-h-screen pt-32 pb-20">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-dark-900 via-dark-800 to-dark-900 text-white">
+      <div className="container mx-auto px-4 py-12">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -161,42 +134,17 @@ const ItineraryViewer = () => {
           transition={{ duration: 0.8 }}
           className="card-cyber p-8 mb-8"
         >
-          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+          <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-4xl md:text-5xl font-cyber font-bold mb-4">
-                <span className="text-neon-teal">{itinerary.city}</span> Adventure
-              </h1>
-              <p className="text-xl text-dark-300 mb-4">{itinerary.summary}</p>
-              <div className="flex flex-wrap gap-4 text-sm">
-                <div className="flex items-center space-x-2">
-                  <Calendar className="w-4 h-4 text-neon-teal" />
-                  <span className="text-dark-300">{itinerary.days} days</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <IndianRupee className="w-4 h-4 text-neon-teal" />
-                  <span className="text-dark-300">Budget: ₹{itinerary.totalBudget.toLocaleString()}</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <MapPin className="w-4 h-4 text-neon-teal" />
-                  <span className="text-dark-300">{itinerary.city}, India</span>
-                </div>
-              </div>
+              <h1 className="text-3xl font-cyber font-bold text-white">{itinerary.city} – {itinerary.days} Days</h1>
+              <p className="text-dark-300 mt-2">Generated on {new Date(itinerary.generatedAt).toLocaleDateString()}</p>
             </div>
-            
-            <div className="flex flex-col sm:flex-row gap-3">
-              <motion.button
-                className="btn-cyber text-sm px-6 py-2"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
+            <div className="flex space-x-3">
+              <motion.button className="btn-cyber-secondary">
                 <Download className="w-4 h-4 mr-2" />
                 Export PDF
               </motion.button>
-              <motion.button
-                className="px-6 py-2 border border-neon-teal/30 text-neon-teal rounded-lg hover:bg-neon-teal/10 transition-all duration-300"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
+              <motion.button className="btn-cyber-secondary">
                 <Share2 className="w-4 h-4 mr-2" />
                 Share
               </motion.button>
@@ -236,14 +184,14 @@ const ItineraryViewer = () => {
           </div>
         </motion.div>
 
-        {/* Location Map */}
+        {/* Real OSM Map (Leaflet) */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.25 }}
           className="mb-8"
         >
-          <MapViewer location={itinerary.city} height="300px" />
+          <LeafletMap query={itinerary.city} height="320px" />
         </motion.div>
 
         {/* Recommendations */}
@@ -307,32 +255,13 @@ const ItineraryViewer = () => {
                             }`}>
                               {activity.time}
                             </span>
-                            <span className="px-2 py-1 bg-dark-700 rounded text-xs text-dark-300">
-                              {activity.category}
-                            </span>
+                            <span className="text-white font-medium">{activity.place}</span>
                           </div>
-                          <h4 className="text-lg font-semibold text-white mb-1">
-                            {activity.place}
-                          </h4>
-                          <p className="text-dark-300 mb-3">{activity.description}</p>
-                          <div className="flex items-center space-x-4 text-sm text-dark-400">
-                            <span className="flex items-center">
-                              <Clock className="w-4 h-4 mr-1" />
-                              {activity.duration_minutes} min
-                            </span>
-                                                          <span className="flex items-center">
-                                <IndianRupee className="w-4 h-4 mr-1" />
-                                ₹{activity.cost.toLocaleString()}
-                              </span>
-                          </div>
+                          <p className="text-dark-300">{activity.description}</p>
                         </div>
-                        <div className="flex space-x-2 ml-4">
-                          <button className="p-2 bg-dark-700 rounded-lg hover:bg-neon-teal/20 transition-colors duration-300">
-                            <Navigation className="w-4 h-4 text-neon-teal" />
-                          </button>
-                          <button className="p-2 bg-dark-700 rounded-lg hover:bg-neon-teal/20 transition-colors duration-300">
-                            <Heart className="w-4 h-4 text-neon-teal" />
-                          </button>
+                        <div className="text-right ml-4">
+                          <div className="text-neon-teal font-bold">₹{activity.cost.toLocaleString()}</div>
+                          <div className="text-dark-400 text-sm">{activity.duration_minutes} mins</div>
                         </div>
                       </div>
                     </div>
@@ -346,34 +275,18 @@ const ItineraryViewer = () => {
                   <Utensils className="w-5 h-5 mr-2 text-neon-teal" />
                   Dining
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {day.dining.map((restaurant, index) => (
-                    <div key={index} className="bg-dark-800/50 rounded-lg p-4 border border-neon-purple/30">
+                <div className="space-y-4">
+                  {day.dining.map((dine, index) => (
+                    <div key={index} className="bg-dark-800/50 rounded-lg p-4 border-l-4 border-neon-purple">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <h4 className="text-lg font-semibold text-white mb-1">
-                            {restaurant.name}
-                          </h4>
-                          <div className="flex items-center space-x-2 mb-2">
-                            <span className="px-2 py-1 bg-neon-purple/20 text-neon-purple rounded text-xs">
-                              {restaurant.cuisine}
-                            </span>
-                            <span className="text-dark-400 text-sm">
-                              {restaurant.price_range}
-                            </span>
-                          </div>
-                          <p className="text-dark-300 text-sm mb-3">{restaurant.description}</p>
-                          <div className="text-neon-teal font-semibold">
-                            ₹{restaurant.price_per_person.toLocaleString()} per person
-                          </div>
+                          <div className="text-white font-medium">{dine.name}</div>
+                          <div className="text-dark-400 text-sm mb-1">{dine.cuisine}</div>
+                          <p className="text-dark-300">{dine.description}</p>
                         </div>
-                        <div className="flex space-x-2 ml-4">
-                          <button className="p-2 bg-dark-700 rounded-lg hover:bg-neon-purple/20 transition-colors duration-300">
-                            <Phone className="w-4 h-4 text-neon-purple" />
-                          </button>
-                          <button className="p-2 bg-dark-700 rounded-lg hover:bg-neon-purple/20 transition-colors duration-300">
-                            <Heart className="w-4 h-4 text-neon-purple" />
-                          </button>
+                        <div className="text-right ml-4">
+                          <div className="text-neon-purple font-bold">₹{dine.price_per_person.toLocaleString()}</div>
+                          <div className="text-dark-400 text-sm">{dine.price_range}</div>
                         </div>
                       </div>
                     </div>

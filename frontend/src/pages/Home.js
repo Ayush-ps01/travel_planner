@@ -10,8 +10,7 @@ import {
   Star,
   ArrowRight,
   Plane,
-  Compass,
-  Clock
+  Compass
 } from 'lucide-react';
 
 const Home = () => {
