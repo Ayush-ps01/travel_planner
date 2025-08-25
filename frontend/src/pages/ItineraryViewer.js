@@ -10,6 +10,138 @@ import {
 } from 'lucide-react';
 import LeafletMap from '../components/LeafletMap';
 
+const cityPresets = {
+  Mumbai: {
+    recommendations: [
+      'Visit Gateway of India early morning to avoid crowds',
+      'Book Elephanta Caves tickets in advance',
+      'Try local street food at Juhu Beach',
+      'Use local trains and taxis for efficient transportation'
+    ],
+    days: [
+      {
+        summary: 'Arrival and Mumbai landmarks',
+        activities: [
+          { time: 'morning', place: 'Gateway of India', description: 'Iconic waterfront arch-monument by the harbour', cost: 0, duration_minutes: 120, category: 'attraction' },
+          { time: 'afternoon', place: 'Chhatrapati Shivaji Terminus (UNESCO)', description: 'Victorian Gothic railway station and landmark', cost: 0, duration_minutes: 90, category: 'heritage' },
+          { time: 'evening', place: 'Marine Drive', description: 'Sunset walk along the Queen’s Necklace', cost: 0, duration_minutes: 60, category: 'leisure' }
+        ],
+        dining: [ { name: 'Bademiya', cuisine: 'Indian', description: 'Famous kebabs near Colaba', price_per_person: 800, price_range: '₹₹' } ]
+      },
+      {
+        summary: 'Culture and seaside vibes',
+        activities: [
+          { time: 'morning', place: 'Elephanta Caves', description: 'Ferry trip to ancient rock-cut caves', cost: 600, duration_minutes: 180, category: 'heritage' },
+          { time: 'afternoon', place: 'Haji Ali Dargah', description: 'Sea-linked mosque with serene views', cost: 0, duration_minutes: 60, category: 'attraction' },
+          { time: 'evening', place: 'Juhu Beach', description: 'Street food and beachside vibe', cost: 200, duration_minutes: 90, category: 'leisure' }
+        ],
+        dining: [ { name: 'Prithvi Cafe', cuisine: 'Cafe', description: 'Cozy bites in Juhu', price_per_person: 700, price_range: '₹₹' } ]
+      }
+    ]
+  },
+  Delhi: {
+    recommendations: [
+      'Start early to beat traffic and queues',
+      'Pre-book Red Fort and Qutub Minar tickets',
+      'Try local chaat in Chandni Chowk',
+      'Use Metro for faster travel across the city'
+    ],
+    days: [
+      {
+        summary: 'Heritage circuit',
+        activities: [
+          { time: 'morning', place: 'Qutub Minar', description: 'UNESCO-listed minaret complex', cost: 600, duration_minutes: 120, category: 'heritage' },
+          { time: 'afternoon', place: 'Humayun’s Tomb', description: 'Mughal-era garden-tomb', cost: 600, duration_minutes: 90, category: 'heritage' },
+          { time: 'evening', place: 'India Gate & Rajpath', description: 'Evening stroll at national landmarks', cost: 0, duration_minutes: 60, category: 'leisure' }
+        ],
+        dining: [ { name: 'Karim’s', cuisine: 'Mughlai', description: 'Old Delhi culinary classic', price_per_person: 600, price_range: '₹₹' } ]
+      },
+      {
+        summary: 'Old Delhi flavors',
+        activities: [
+          { time: 'morning', place: 'Red Fort', description: 'Historic fort complex', cost: 600, duration_minutes: 120, category: 'heritage' },
+          { time: 'afternoon', place: 'Jama Masjid', description: 'Grand mosque with views from minaret', cost: 0, duration_minutes: 60, category: 'religious' },
+          { time: 'evening', place: 'Chandni Chowk', description: 'Food and bazaars exploration', cost: 300, duration_minutes: 120, category: 'food' }
+        ],
+        dining: [ { name: 'Paranthe Wali Gali', cuisine: 'North Indian', description: 'Stuffed parathas alley', price_per_person: 300, price_range: '₹' } ]
+      }
+    ]
+  },
+  Jaipur: {
+    recommendations: [
+      'Buy composite ticket for major forts',
+      'Hydrate and wear comfortable footwear',
+      'Best light is early morning for photos',
+      'Try traditional thali for dinner'
+    ],
+    days: [
+      {
+        summary: 'Royal forts and views',
+        activities: [
+          { time: 'morning', place: 'Amber Fort', description: 'Hilltop fort with intricate palaces', cost: 500, duration_minutes: 180, category: 'heritage' },
+          { time: 'afternoon', place: 'Jaigarh Fort', description: 'Fort with cannon and city views', cost: 200, duration_minutes: 90, category: 'heritage' },
+          { time: 'evening', place: 'Jal Mahal View Point', description: 'Lake palace views at sunset', cost: 0, duration_minutes: 45, category: 'leisure' }
+        ],
+        dining: [ { name: 'Laxmi Mishthan Bhandar (LMB)', cuisine: 'Rajasthani', description: 'Sweets and thali', price_per_person: 500, price_range: '₹₹' } ]
+      },
+      {
+        summary: 'Pink City icons',
+        activities: [
+          { time: 'morning', place: 'City Palace & Jantar Mantar', description: 'Royal residence and observatory', cost: 700, duration_minutes: 180, category: 'heritage' },
+          { time: 'afternoon', place: 'Hawa Mahal', description: 'Iconic palace of winds facade', cost: 200, duration_minutes: 60, category: 'heritage' },
+          { time: 'evening', place: 'Bapu Bazaar', description: 'Shopping for handicrafts', cost: 0, duration_minutes: 90, category: 'shopping' }
+        ],
+        dining: [ { name: 'Chokhi Dhani', cuisine: 'Rajasthani', description: 'Cultural village dinner', price_per_person: 1200, price_range: '₹₹₹' } ]
+      }
+    ]
+  }
+};
+
+function generateMockItinerary(city) {
+  const key = (city || '').trim();
+  const preset = cityPresets[key] || null;
+  const base = {
+    recommendations: [
+      'Start early to maximize your day',
+      'Pre-book popular attractions where possible',
+      'Use local transport or walk for short distances',
+      'Keep some buffer for traffic and queues'
+    ],
+    days: [
+      {
+        summary: `Discovering ${city} highlights`,
+        activities: [
+          { time: 'morning', place: `${city} City Museum`, description: `Learn about ${city} heritage and culture`, cost: 300, duration_minutes: 120, category: 'museum' },
+          { time: 'afternoon', place: `${city} Central Market`, description: 'Local shopping and snacks', cost: 200, duration_minutes: 90, category: 'shopping' },
+          { time: 'evening', place: `${city} Riverside Promenade`, description: 'Relaxing walk and sunset views', cost: 0, duration_minutes: 60, category: 'leisure' }
+        ],
+        dining: [ { name: `${city} Kitchen`, cuisine: 'Local', description: 'Popular local dishes', price_per_person: 600, price_range: '₹₹' } ]
+      },
+      {
+        summary: `Culture and food in ${city}`,
+        activities: [
+          { time: 'morning', place: `${city} Fort or Old Town`, description: 'Historic quarter exploration', cost: 300, duration_minutes: 150, category: 'heritage' },
+          { time: 'afternoon', place: `${city} Art District`, description: 'Galleries and street art', cost: 200, duration_minutes: 90, category: 'art' },
+          { time: 'evening', place: `${city} Night Bazaar`, description: 'Souvenirs and street food', cost: 300, duration_minutes: 120, category: 'food' }
+        ],
+        dining: [ { name: `${city} Spice House`, cuisine: 'Indian', description: 'Regional specialties', price_per_person: 700, price_range: '₹₹' } ]
+      }
+    ]
+  };
+
+  const data = preset || base;
+  return {
+    totalBudget: 150000,
+    days: data.days.length,
+    generatedAt: new Date().toISOString(),
+    summary: `A perfect ${data.days.length}-day ${city} adventure combining culture, cuisine, and iconic landmarks.`,
+    totalCost: 142000,
+    savings: 8000,
+    recommendations: data.recommendations,
+    itinerary: data.days.map((d, idx) => ({ day: idx + 1, ...d }))
+  };
+}
+
 const ItineraryViewer = () => {
   const { id } = useParams();
   const location = useLocation();
@@ -19,102 +151,19 @@ const ItineraryViewer = () => {
   const [itinerary, setItinerary] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Mock itinerary data for demo
   useEffect(() => {
     const city = cityParam && cityParam.trim() ? cityParam : 'Mumbai';
+    const mock = generateMockItinerary(city);
     const mockItinerary = {
-      id: id,
+      id,
       city,
-      totalBudget: 150000,
-      days: 5,
-      generatedAt: new Date().toISOString(),
-      summary: `A perfect 5-day ${city} adventure combining culture, cuisine, and iconic landmarks.`,
-      totalCost: 142000,
-      savings: 8000,
-      recommendations: [
-        'Visit Gateway of India early morning to avoid crowds',
-        'Book Elephanta Caves tickets in advance',
-        'Try local street food at Juhu Beach',
-        'Use local trains and taxis for efficient transportation'
-      ],
-      itinerary: [
-        {
-          day: 1,
-          summary: 'Arrival and Mumbai landmarks',
-          activities: [
-            {
-              time: 'morning',
-              place: 'Eiffel Tower',
-              description: 'Start your Paris adventure with the iconic symbol of the city',
-              cost: 2000,
-              duration_minutes: 120,
-              category: 'attraction'
-            },
-            {
-              time: 'afternoon',
-              place: 'Gateway of India',
-              description: 'Marvel at this historic monument and enjoy panoramic city views',
-              cost: 0,
-              duration_minutes: 90,
-              category: 'attraction'
-            },
-            {
-              time: 'evening',
-              place: 'Marine Drive',
-              description: 'Stroll down the famous promenade and enjoy evening atmosphere',
-              cost: 0,
-              duration_minutes: 60,
-              category: 'shopping'
-            }
-          ],
-          dining: [
-            {
-              name: 'Le Petit Bistrot',
-              cuisine: 'French',
-              description: 'Authentic French bistro with classic dishes',
-              price_per_person: 1500,
-              price_range: '₹₹'
-            }
-          ]
-        },
-        {
-          day: 2,
-          summary: 'Art, culture and heritage immersion',
-          activities: [
-            {
-              time: 'morning',
-              place: 'Chhatrapati Shivaji Maharaj Vastu Sangrahalaya',
-              description: 'Explore Mumbai\'s premier museum with rich cultural heritage',
-              cost: 500,
-              duration_minutes: 180,
-              category: 'museum'
-            },
-            {
-              time: 'afternoon',
-              place: 'Haji Ali Dargah',
-              description: 'Visit this beautiful mosque located on an islet off the coast',
-              cost: 0,
-              duration_minutes: 60,
-              category: 'attraction'
-            }
-          ],
-          dining: [
-            {
-              name: 'Bademiya',
-              cuisine: 'Indian',
-              description: 'Famous kebab and North Indian eatery',
-              price_per_person: 800,
-              price_range: '₹₹'
-            }
-          ]
-        }
-      ]
+      ...mock
     };
 
     setTimeout(() => {
       setItinerary(mockItinerary);
       setLoading(false);
-    }, 800);
+    }, 300);
   }, [id, cityParam]);
 
   if (loading) {
