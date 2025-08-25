@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import { 
   Calendar, 
   MapPin, 
-  DollarSign, 
   Clock, 
   Utensils, 
   Camera,
@@ -16,6 +15,7 @@ import {
   Phone,
   IndianRupee
 } from 'lucide-react';
+import MapViewer from '../components/MapViewer';
 
 const ItineraryViewer = () => {
   const { id } = useParams();
@@ -234,6 +234,16 @@ const ItineraryViewer = () => {
               <div className="text-dark-400">Per Day</div>
             </div>
           </div>
+        </motion.div>
+
+        {/* Location Map */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.25 }}
+          className="mb-8"
+        >
+          <MapViewer location={itinerary.city} height="300px" />
         </motion.div>
 
         {/* Recommendations */}
