@@ -105,6 +105,11 @@ const ItineraryGenerator = () => {
       // Generate a mock itinerary ID
       const itineraryId = `itinerary_${Date.now()}`;
       
+      // Persist selected city for the viewer fallback
+      try {
+        sessionStorage.setItem('selectedCity', formData.city);
+      } catch {}
+
       toast.success('Itinerary generated successfully!');
       // Pass city to the viewer so map centers correctly
       navigate(`/itinerary/${itineraryId}?city=${encodeURIComponent(formData.city)}`);

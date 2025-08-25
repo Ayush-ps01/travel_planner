@@ -10,8 +10,11 @@ import {
 } from 'lucide-react';
 import LeafletMap from '../components/LeafletMap';
 
+// normalize helper
+const norm = (s) => (s || '').trim();
+
 const cityPresets = {
-  Mumbai: {
+  mumbai: {
     recommendations: [
       'Visit Gateway of India early morning to avoid crowds',
       'Book Elephanta Caves tickets in advance',
@@ -39,7 +42,7 @@ const cityPresets = {
       }
     ]
   },
-  Delhi: {
+  delhi: {
     recommendations: [
       'Start early to beat traffic and queues',
       'Pre-book Red Fort and Qutub Minar tickets',
@@ -52,7 +55,7 @@ const cityPresets = {
         activities: [
           { time: 'morning', place: 'Qutub Minar', description: 'UNESCO-listed minaret complex', cost: 600, duration_minutes: 120, category: 'heritage' },
           { time: 'afternoon', place: 'Humayun’s Tomb', description: 'Mughal-era garden-tomb', cost: 600, duration_minutes: 90, category: 'heritage' },
-          { time: 'evening', place: 'India Gate & Rajpath', description: 'Evening stroll at national landmarks', cost: 0, duration_minutes: 60, category: 'leisure' }
+          { time: 'evening', place: 'India Gate & Kartavya Path', description: 'Evening stroll at national landmarks', cost: 0, duration_minutes: 60, category: 'leisure' }
         ],
         dining: [ { name: 'Karim’s', cuisine: 'Mughlai', description: 'Old Delhi culinary classic', price_per_person: 600, price_range: '₹₹' } ]
       },
@@ -67,7 +70,7 @@ const cityPresets = {
       }
     ]
   },
-  Jaipur: {
+  jaipur: {
     recommendations: [
       'Buy composite ticket for major forts',
       'Hydrate and wear comfortable footwear',
@@ -98,7 +101,7 @@ const cityPresets = {
 };
 
 function generateMockItinerary(city) {
-  const key = (city || '').trim();
+  const key = norm(city).toLowerCase();
   const preset = cityPresets[key] || null;
   const base = {
     recommendations: [
@@ -128,7 +131,6 @@ function generateMockItinerary(city) {
       }
     ]
   };
-
   const data = preset || base;
   return {
     totalBudget: 150000,
@@ -144,27 +146,25 @@ function generateMockItinerary(city) {
 
 const ItineraryViewer = () => {
   const { id } = useParams();
-  const location = useLocation();
-  const params = new URLSearchParams(location.search);
-  const cityParam = params.get('city');
+  const loc = useLocation();
+  const params = new URLSearchParams(loc.search);
 
   const [itinerary, setItinerary] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const city = cityParam && cityParam.trim() ? cityParam : 'Mumbai';
-    const mock = generateMockItinerary(city);
-    const mockItinerary = {
-      id,
-      city,
-      ...mock
-    };
+    let city = params.get('city');
+    if (!city) {
+      try { city = sessionStorage.getItem('selectedCity') || ''; } catch {}
+    }
+    city = norm(city) || 'Mumbai';
 
-    setTimeout(() => {
-      setItinerary(mockItinerary);
-      setLoading(false);
-    }, 300);
-  }, [id, cityParam]);
+    const mock = generateMockItinerary(city);
+    const mockItinerary = { id, city, ...mock };
+
+    setItinerary(mockItinerary);
+    setLoading(false);
+  }, [id, loc.search]);
 
   if (loading) {
     return (
